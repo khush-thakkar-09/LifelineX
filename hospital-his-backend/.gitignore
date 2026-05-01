@@ -35,8 +35,8 @@ npm-debug.log*
 yarn-error.log*
 
 # Environment
-.env
-.env.*
+/Users/khush/Desktop/Brained/LifeLineX/Co-Code-S4DS/hospital-his-backend/.env
+/Users/khush/Desktop/Brained/LifeLineX/Co-Code-S4DS/hospital-his-backend/.env.*
 
 # Logs
 logs/
