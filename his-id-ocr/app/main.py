@@ -26,7 +26,6 @@ import logging
 
 # Local imports
 from .extractor import extract_patient_details
-from .image_masker import process_pil_image
 
 # Configure logging
 logging.basicConfig(
@@ -54,14 +53,9 @@ app.add_middleware(
 # Directory configuration
 BASE_DIR = Path(__file__).parent
 UPLOAD_DIR_RAW = BASE_DIR / "uploads" / "raw"
-UPLOAD_DIR_MASKED = BASE_DIR / "uploads" / "masked"
 
 # Ensure directories exist
 UPLOAD_DIR_RAW.mkdir(parents=True, exist_ok=True)
-UPLOAD_DIR_MASKED.mkdir(parents=True, exist_ok=True)
-
-# Mount static files for serving masked images
-app.mount("/masked-images", StaticFiles(directory=str(UPLOAD_DIR_MASKED)), name="masked-images")
 
 
 # Response model
@@ -74,8 +68,6 @@ class ExtractionResponse(BaseModel):
     gender: Optional[str] = None
     phone: Optional[str] = None
     maskedAadhaar: Optional[str] = None
-    maskedImagePath: Optional[str] = None
-    maskedImageUrl: Optional[str] = None
     confidence: str = "low"
     message: Optional[str] = None
 
@@ -99,8 +91,7 @@ async def health_check():
     """Detailed health check"""
     return {
         "status": "healthy",
-        "raw_upload_dir": str(UPLOAD_DIR_RAW),
-        "masked_upload_dir": str(UPLOAD_DIR_MASKED)
+        "raw_upload_dir": str(UPLOAD_DIR_RAW)
     }
 
 
@@ -113,10 +104,10 @@ async def extract_id(file: UploadFile = File(...)):
     1. Receives an image file
     2. Saves raw image temporarily
     3. Runs text extraction (Tesseract OCR)
-    4. Masks Aadhaar number in the image
+    4. Deletes the raw image instantly
     5. Returns extracted data with masked Aadhaar
     
-    **Privacy Note**: Raw Aadhaar number is NEVER returned or stored.
+    **Privacy Note**: Raw Aadhaar number and raw images are NEVER returned or stored.
     Only masked format (XXXX XXXX 1234) is returned.
     """
     logger.info(f"Received file: {file.filename}, Content-Type: {file.content_type}")
@@ -154,21 +145,12 @@ async def extract_id(file: UploadFile = File(...)):
         logger.info("Extracting patient details with AI...")
         extraction_result = extract_patient_details(pil_image)
         
-        # Mask Aadhaar in the image
-        logger.info("Masking Aadhaar in image...")
-        masked_path = process_pil_image(
-            pil_image,
-            str(UPLOAD_DIR_MASKED),
-            safe_filename,
-            method='blur'
-        )
+        # Delete raw image instantly after processing for absolute privacy
+        if raw_path.exists():
+            raw_path.unlink()
+            logger.info("Raw image instantly deleted for privacy")
         
         # Build response (exclude raw Aadhaar!)
-        masked_image_url = None
-        if masked_path:
-            masked_filename = os.path.basename(masked_path)
-            masked_image_url = f"/masked-images/{masked_filename}"
-        
         response = ExtractionResponse(
             success=True,
             firstName=extraction_result.get("firstName"),
@@ -177,19 +159,11 @@ async def extract_id(file: UploadFile = File(...)):
             gender=extraction_result.get("gender"),
             phone=extraction_result.get("phone"),
             maskedAadhaar=extraction_result.get("maskedAadhaar"),
-            maskedImagePath=masked_path,
-            maskedImageUrl=masked_image_url,
             confidence=extraction_result.get("confidence", "low"),
             message="Extraction successful"
         )
         
         logger.info(f"Extraction complete. Confidence: {response.confidence}")
-        
-        # Optionally delete raw image after processing for extra privacy
-        # Uncomment the following lines in production:
-        # if raw_path.exists():
-        #     raw_path.unlink()
-        #     logger.info("Raw image deleted for privacy")
         
         return response
         

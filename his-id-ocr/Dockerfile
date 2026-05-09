@@ -44,7 +44,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY app/ ./app/
 
 # Create upload directories
-RUN mkdir -p app/uploads/raw app/uploads/masked
+RUN mkdir -p app/uploads/raw
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
