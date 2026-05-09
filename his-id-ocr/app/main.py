@@ -99,7 +99,6 @@ async def health_check():
     """Detailed health check"""
     return {
         "status": "healthy",
-        "model_loaded": get_donut_loader()._initialized,
         "raw_upload_dir": str(UPLOAD_DIR_RAW),
         "masked_upload_dir": str(UPLOAD_DIR_MASKED)
     }
@@ -151,7 +150,7 @@ async def extract_id(file: UploadFile = File(...)):
         if pil_image.mode != 'RGB':
             pil_image = pil_image.convert('RGB')
         
-        # Extract patient details using Donut model
+        # Extract patient details using Tesseract OCR
         logger.info("Extracting patient details with AI...")
         extraction_result = extract_patient_details(pil_image)
         
