@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { WelcomeBanner } from '../../components/dashboard';
 
-const SOCKET_URL = 'http://localhost:5001';
+const SOCKET_URL = (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5001') + '';
 const POLLING_INTERVAL = 30000; // 30 seconds
 
 // Custom CountUp Component for animated numbers

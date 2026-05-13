@@ -5,7 +5,7 @@ import labService from '../../services/lab.service';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_URL = 'http://localhost:5001/api/v1/';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1') + '/';
 const getConfig = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     return { headers: { Authorization: `Bearer ${user?.token}` } };
@@ -129,7 +129,7 @@ const DoctorLabTests = () => {
             const pdfPath = selectedTest.reportPdf.startsWith('/')
                 ? selectedTest.reportPdf
                 : '/' + selectedTest.reportPdf;
-            return `http://localhost:5001${pdfPath}`;
+            return `${(import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5001') + '')}${pdfPath}`;
         }
         return null;
     };

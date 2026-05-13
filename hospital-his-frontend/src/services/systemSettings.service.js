@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api/v1/system-settings';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1') + '/system-settings';
 
 // Get token from local storage
 const getConfig = () => {

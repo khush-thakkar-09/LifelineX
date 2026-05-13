@@ -13,7 +13,7 @@ import io from 'socket.io-client';
 import { WelcomeBanner, OPDScheduleChart } from '../../components/dashboard';
 import { StatCardSkeleton, WelcomeBannerSkeleton, NeedsAttentionSkeleton, ChartSkeleton } from '../../components/ui/Skeletons';
 
-const SOCKET_URL = 'http://localhost:5001';
+const SOCKET_URL = (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5001') + '';
 const POLLING_INTERVAL = 60000; // 1 minute
 
 // Animated CountUp

@@ -255,7 +255,7 @@ const LabReportView = () => {
                     <div className="p-4">
                         {report?.pdf?.url ? (
                             <iframe
-                                src={`http://localhost:5001${report.pdf.url}`}
+                                src={`${(import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5001') + '')}${report.pdf.url}`}
                                 className="w-full h-[600px] border rounded-lg"
                                 title="Lab Report PDF"
                             />

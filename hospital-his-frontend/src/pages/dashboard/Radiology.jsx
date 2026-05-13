@@ -136,7 +136,7 @@ const ReportEntryModal = ({ order, onClose, onSubmit }) => {
 
                 // Upload to backend
                 const user = JSON.parse(localStorage.getItem('user'));
-                const response = await fetch(`http://localhost:5001/api/v1/radiology/upload-scan/${order._id}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1') + ''}/radiology/upload-scan/${order._id}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${user?.token}`
